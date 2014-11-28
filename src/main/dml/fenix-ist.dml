@@ -4,6 +4,41 @@ class user.management.IstUsernameCounter {
     long lastValue;
 }
 
+class cms.unit.UnitSite extends .org.fenixedu.cms.domain.Site {}
+class cms.homepage.HomepageSite extends .org.fenixedu.cms.domain.Site {}
+class cms.homepage.ResearcherComponent extends .org.fenixedu.cms.domain.component.Component  {
+	String titleKey;
+	String titleBundle;
+	String dataKey;
+}
+
+class cms.homepage.PresentationComponent extends .org.fenixedu.cms.domain.component.Component  {
+    boolean showActiveStudentCurricularPlans;
+    boolean showAlternativeHomepage;
+    boolean showAlumniDegrees;
+    boolean showCategory;
+    boolean showCurrentAttendingExecutionCourses;
+    boolean showCurrentExecutionCourses;
+    boolean showEmail;
+    boolean showMobileTelephone;
+    boolean showPhoto;
+    boolean showResearchUnitHomepage;
+    boolean showPersonalTelephone;
+    boolean showUnit;
+    boolean showWorkTelephone;
+    String researchUnitHomepage;
+    LocalizedString researchUnitName;
+}
+
+relation UnitSiteHasUnit {
+    cms.unit.UnitSite playsRole cmsSite {
+    	    multiplicity 0..1;
+    }
+    .net.sourceforge.fenixedu.domain.organizationalStructure.Unit playsRole unit {
+    	    multiplicity 1..1;
+    }
+}
+
 relation BennuHasIstUsernameCounter {
     .org.fenixedu.bennu.core.domain.Bennu playsRole bennu {
         multiplicity 1..1;

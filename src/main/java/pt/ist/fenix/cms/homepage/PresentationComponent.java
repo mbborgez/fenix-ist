@@ -26,8 +26,8 @@ public class PresentationComponent extends PresentationComponent_Base {
 
     @Override
     public void handle(Page page, TemplateContext local, TemplateContext global) {
-        User user = page.getSite().getCreatedBy();
-        Person owner = user.getPerson();
+        HomepageSite site = (HomepageSite) page.getSite();
+        Person owner = site.getOwner();
 
         global.put("ownerName", owner.getNickname());
 

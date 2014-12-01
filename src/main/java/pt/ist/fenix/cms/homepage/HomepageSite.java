@@ -11,9 +11,9 @@ public class HomepageSite extends HomepageSite_Base {
         super();
         setBennu(Bennu.getInstance());
         setName(getLocalizedString("resources.FenixEduCMSResources", "homepage.title", person.getName()));
+        setDescription(getLocalizedString("resources.FenixEduCMSResources", "homepage.title", person.getName()));
         setSlug(person.getUser().getUsername());
-        setCreatedBy(person.getUser());
-        setCreatedBy(person.getUser());
+        setOwner(person);
     }
 
     @Override

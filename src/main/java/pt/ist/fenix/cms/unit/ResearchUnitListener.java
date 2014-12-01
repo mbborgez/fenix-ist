@@ -36,7 +36,7 @@ public class ResearchUnitListener {
         final Menu menu = new Menu(newSite, MENU_TITLE);
         final User user = Authenticate.getUser();
 
-        newSite.setTheme(CMSTheme.forType("fenixedu-default-theme"));
+        newSite.setTheme(CMSTheme.forType("fenixedu-units-theme"));
 
         Component menuComponent = new MenuComponent(menu);
         Component announcementsComponent = new ListCategoryPosts(newSite.categoryForSlug("announcement", ANNOUNCEMENTS_TITLE));

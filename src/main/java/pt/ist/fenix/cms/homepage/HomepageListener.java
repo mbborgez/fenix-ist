@@ -36,7 +36,7 @@ public class HomepageListener {
         Menu menu = new Menu(newSite, MENU_TITLE);
         User user = Authenticate.getUser();
 
-        newSite.setTheme(CMSTheme.forType("fenixedu-default-theme"));
+        newSite.setTheme(CMSTheme.forType("fenixedu-homepages-theme"));
 
         Component menuComponent = new MenuComponent(menu);
         Component presentationComponent = new PresentationComponent();

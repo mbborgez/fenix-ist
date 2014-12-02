@@ -39,7 +39,7 @@ public class HomepageListener {
         newSite.setTheme(CMSTheme.forType("fenixedu-homepages-theme"));
 
         Component menuComponent = new MenuComponent(menu);
-        Component presentationComponent = new PresentationComponent();
+        Component presentationComponent = Component.forType(PresentationComponent.class);
         Component interestsComponent = new ResearcherComponent(INTERESTS_KEY, BUNDLE, "interests");
         Component prizesComponent = new ResearcherComponent(PRIZES_KEY, BUNDLE, "prizes");
         Component activitiesComponent = new ResearcherComponent(ACTIVITIES_KEY, BUNDLE, "activities");

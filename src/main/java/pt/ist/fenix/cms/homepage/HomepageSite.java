@@ -19,6 +19,7 @@ public class HomepageSite extends HomepageSite_Base {
     @Override
     @Atomic
     public void delete() {
+        setOwner(null);
         super.delete();
     }
 }

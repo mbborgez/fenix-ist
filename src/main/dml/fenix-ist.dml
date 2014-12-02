@@ -5,14 +5,7 @@ class user.management.IstUsernameCounter {
 }
 
 class cms.unit.UnitSite extends .org.fenixedu.cms.domain.Site {}
-class cms.homepage.HomepageSite extends .org.fenixedu.cms.domain.Site {}
-class cms.homepage.ResearcherComponent extends .org.fenixedu.cms.domain.component.Component  {
-	String titleKey;
-	String titleBundle;
-	String dataKey;
-}
-
-class cms.homepage.PresentationComponent extends .org.fenixedu.cms.domain.component.Component  {
+class cms.homepage.HomepageSite extends .org.fenixedu.cms.domain.Site {
     boolean showActiveStudentCurricularPlans;
     boolean showAlternativeHomepage;
     boolean showAlumniDegrees;
@@ -28,6 +21,12 @@ class cms.homepage.PresentationComponent extends .org.fenixedu.cms.domain.compon
     boolean showWorkTelephone;
     String researchUnitHomepage;
     LocalizedString researchUnitName;
+}
+
+class cms.homepage.ResearcherComponent extends .org.fenixedu.cms.domain.component.Component  {
+	String titleKey;
+	String titleBundle;
+	String dataKey;
 }
 
 relation HomepageHasOwner {

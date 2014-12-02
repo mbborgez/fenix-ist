@@ -4,9 +4,9 @@ import org.springframework.web.servlet.view.JstlView;
 
 import javax.servlet.http.HttpServletRequest;
 
-public class PagesAdminView extends JstlView {
+public class TeacherPagesView extends JstlView {
 
-    private static PagesAdminView instance;
+    private static TeacherPagesView instance;
 
     @Override
     protected void exposeHelpers(HttpServletRequest request) throws Exception {
@@ -20,9 +20,9 @@ public class PagesAdminView extends JstlView {
         return "/teacher/executionCourse/executionCourseFrame.jsp";
     }
 
-    public static PagesAdminView getInstance() {
+    public static TeacherPagesView getInstance() {
         if(instance==null) {
-            instance = new PagesAdminView();
+            instance = new TeacherPagesView();
         }
         return instance;
     }

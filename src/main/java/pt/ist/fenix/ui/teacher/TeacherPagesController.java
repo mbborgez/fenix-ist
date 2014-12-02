@@ -23,11 +23,21 @@ import java.util.Optional;
 import static pt.ist.fenixframework.FenixFramework.getDomainObject;
 
 @RestController
-@RequestMapping("/pages/{siteId}/admin")
-public class PagesAdminController extends StrutsFunctionalityController {
+@RequestMapping("/teacher/{executionCourseId}/pages")
+public class TeacherPagesController extends StrutsFunctionalityController {
 
     @Autowired
     PagesAdminService service;
+
+    @RequestMapping(method = RequestMethod.GET)
+    public TeacherPagesView all(Model model, @PathVariable String executionCourseId) {
+        ExecutionCourse executionCourse = executionCourse(executionCourseId);
+        Professorship professorship = executionCourse.getProfessorship(AccessControl.getPerson());
+        AccessControl.check(person -> professorship!=null && professorship.getPermissions().getSections());
+        model.addAttribute("executionCourse", executionCourse);
+        model.addAttribute("professorship", professorship);
+        return TeacherPagesView.getInstance();
+    }
 
     @RequestMapping(value = "/data", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     public @ResponseBody String data(@PathVariable String siteId) {
@@ -61,7 +71,7 @@ public class PagesAdminController extends StrutsFunctionalityController {
                              @RequestParam(required = true) String name,
                              @RequestParam("attachment") MultipartFile attachment) throws IOException {
         service.addAttachment(name, attachment, getDomainObject(menuItemId));
-        return new RedirectView(String.format("/pages/%s/admin#%s", siteId, menuItemId), true);
+        return new RedirectView(String.format("/teacher/%s/pages#%s", siteId, menuItemId), true);
     }
 
     @RequestMapping(value = "/attachment/{menuItemId}/{fileId}", method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON_VALUE)
@@ -95,5 +105,10 @@ public class PagesAdminController extends StrutsFunctionalityController {
     private static Site site(String siteId) {
         return getDomainObject(siteId);
     }
+
+    private static ExecutionCourse executionCourse(String executionCourseId) {
+        return getDomainObject(executionCourseId);
+    }
+
 
 }

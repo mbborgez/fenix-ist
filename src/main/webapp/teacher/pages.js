@@ -1,10 +1,10 @@
-var teacherApp = angular.module('teacherApp', ['bennuToolkit']);
+var teacherApp = angular.module('pagesApp', ['bennuToolkit', 'angularFileUpload']);
 
-teacherApp.controller('PagesCtrl', [ '$scope', '$http', function ($scope, $http) {
+teacherApp.controller('PagesCtrl', [ '$scope', '$http', '$upload', function ($scope, $http, $upload) {
 
     $scope.selectedFile = undefined;
 
-    $scope.context = window.location.pathname;
+    $scope.context = context || window.location.pathname;
 
     $scope.groups = [];
 
@@ -168,6 +168,24 @@ teacherApp.controller('PagesCtrl', [ '$scope', '$http', function ($scope, $http)
         mlsBody[BennuPortal.locale.tag] = 'New Entry';
         return mlsBody;
     }
+
+    $scope.$watch('files', function() {
+        for (var i = 0; i < $scope.files.length; i++) {
+            console.log(JSON.stringify($scope.files[i]));
+            var file = $scope.files[i];
+            $scope.upload = $upload.upload({
+                url: $scope.context + '/attachment/' + $scope.selected.key,
+                method: 'POST',
+                file: file,
+                fileName: file.name
+            }).progress(function(evt) {
+                console.log('progress: ' + parseInt(100.0 * evt.loaded / evt.total) + '% file :'+ evt.config.file.name);
+            }).success(function(data, status, headers, config) {
+                console.log('file ' + config.file.name + 'is uploaded successfully. Response: ' + JSON.stringify(data));
+                $scope.selected.files = data;
+            });
+        }
+    });
 
 }]);
 

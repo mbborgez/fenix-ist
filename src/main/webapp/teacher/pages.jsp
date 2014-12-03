@@ -22,19 +22,25 @@ along with FenixEdu CMS.  If not, see <http://www.gnu.org/licenses/>.
 <%@ taglib uri="http://www.springframework.org/tags" prefix="spring" %>
 <%@ taglib uri="http://fenix-ashes.ist.utl.pt/fenix-renderers" prefix="fr"%>
 
-<c:set var="context" scope="session" value="${pageContext.request.contextPath}/teacher/${executionCourse.externalId}/pages"/>
+<c:set var="context" scope="session" value="${pageContext.request.contextPath}/pages/${site.externalId}/admin"/>
 
 ${portal.angularToolkit()}
 <link href="${pageContext.request.contextPath}/bennu-admin/fancytree/skin-lion/ui.fancytree.css" rel="stylesheet" type="text/css">
 <script src="${pageContext.request.contextPath}/bennu-admin/fancytree/jquery-ui.min.js" type="text/javascript"></script>
 <script src="${pageContext.request.contextPath}/bennu-admin/fancytree/jquery.fancytree-all.min.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+    context = "${context}";
+</script>
+
+<script src="${pageContext.request.contextPath}/teacher/angular-file-upload.min.js" type="text/javascript"></script>
 <script src="${pageContext.request.contextPath}/teacher/pages.js" type="text/javascript"></script>
 
 <h1><spring:message code="label.pages.management"/></h1>
 
 <br/>
 
-<div ng-app="teacherApp">
+<div ng-app="pagesApp">
     <div ng-controller="PagesCtrl">
 
         <div class="alert alert-danger" ng-if="error"><strong></strong><spring:message code="label.error"/>: </strong><spring:message code="label.error.tryAgain"/></div>
@@ -113,7 +119,7 @@ ${portal.angularToolkit()}
                         <div class="tab-pane fade" id="files">
                             <br/>
                             <p>
-                                <button class="btn btn-default" data-toggle="modal" data-target="#addFile"><spring:message code="action.add.file"/></button>
+                                <button ng-file-select ng-model="files" multiple="true"><spring:message code="action.add.file"/></button>
                             </p>
 
                             <table ng-if="selected.files" class="table table-striped table-bordered">
@@ -149,40 +155,46 @@ ${portal.angularToolkit()}
 
 
                         <div class="modal fade" id="addFile" tabindex="-1" role="dialog" aria-hidden="true">
-                            <form action="${context}/attachment" enctype="multipart/form-data" class="form-horizontal" method="post" role="form">
-                                <div class="modal-dialog">
-                                    <div class="modal-content">
-                                        <div class="modal-header">
-                                            <button type="button" class="close" data-dismiss="modal">
-                                                <span aria-hidden="true">&times;</span>
-                                                <span class="sr-only"><spring:message code="action.close"/></span></button>
-                                            <h4><spring:message code="action.new"/></h4>
-                                        </div>
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <button type="button" class="close" data-dismiss="modal">
+                                            <span aria-hidden="true">&times;</span>
+                                            <span class="sr-only"><spring:message code="action.close"/></span></button>
+                                        <h4><spring:message code="action.new"/></h4>
+                                    </div>
 
-                                        <div class="modal-body">
-                                            <div class="form-group">
+                                    <div class="modal-body">
+                                        <div class="form-group">
 
-                                                <input type="text" name="menuItemId" hidden="true" value="{{ selected.key }}"/>
+                                            <input type="text" name="menuItemId" hidden="true" value="{{ selected.key }}"/>
 
-                                                <label class="col-sm-2 control-label"><spring:message code="label.name"/>:</label>
-                                                <div class="col-sm-10">
-                                                    <input required type="text" name="name" class="form-control" placeholder="<spring:message code="label.file.name.placeholder"/>">
-                                                </div>
-
-                                                <label class="col-sm-2 control-label"><spring:message code="theme.add.label.file"/>:</label>
-                                                <div class="col-sm-10">
-                                                    <input type="file" name="attachment">
-                                                </div>
+                                            <label class="col-sm-2 control-label"><spring:message code="label.name"/>:</label>
+                                            <div class="col-sm-10">
+                                                <input required type="text" name="name" class="form-control" placeholder="<spring:message code="label.file.name.placeholder"/>">
                                             </div>
 
+                                            <label class="col-sm-2 control-label"><spring:message code="theme.add.label.file"/>:</label>
+                                            <div class="col-sm-10">
+                                                <input type="file" name="attachment">
+                                            </div>
                                         </div>
-                                        <div class="modal-footer">
-                                            <button type="submit" class="btn btn-primary"><spring:message code="label.make"/></button>
-                                        </div>
-
                                     </div>
+
+                                    <div class="modal-footer">
+                                        <button type="submit" class="btn btn-primary" ng-click="addAttachment()"><spring:message code="label.make"/></button>
+                                    </div>
+
+                                    <button ng-file-select ng-model="files" multiple="true">Attach Any File</button>
+                                    <div ng-file-drop ng-model="files" class="drop-box"
+                                         drag-over-class="{accept:'dragover', reject:'dragover-err', delay:100}"
+                                         multiple="true" allow-dir="true" accept="image/*,*pdf">
+                                        Drop Images or PDFs files here
+                                    </div>
+                                    <div ng-no-file-drop>File Farg/Drop is not supported for this browser</div>
+
                                 </div>
-                            </form>
+                            </div>
                         </div>
 
                         <div class="modal fade" id="fileDeleteModal" tabindex="-1" role="dialog" aria-hidden="true">

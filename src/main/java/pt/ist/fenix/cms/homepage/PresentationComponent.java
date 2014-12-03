@@ -15,10 +15,15 @@ import org.fenixedu.cms.domain.component.ComponentType;
 import org.fenixedu.cms.rendering.TemplateContext;
 
 import java.util.*;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import static java.util.Arrays.asList;
 import static java.util.stream.Collectors.toList;
+import static net.sourceforge.fenixedu.domain.person.RoleType.*;
+import static net.sourceforge.fenixedu.domain.person.RoleType.CONTACT_ADMIN;
+import static net.sourceforge.fenixedu.domain.person.RoleType.EMPLOYEE;
+import static org.fenixedu.bennu.core.security.Authenticate.getUser;
 
 @ComponentType(name = "Presentation Component", description = "Provides homepage owner's presentation data.")
 public class PresentationComponent extends HomepageSiteComponent {
@@ -64,9 +69,8 @@ public class PresentationComponent extends HomepageSiteComponent {
         }
 
         if (site.getShowCurrentAttendingExecutionCourses()) {
-            SortedSet<Attends> attendedCoursesByName = new TreeSet<Attends>(Attends.ATTENDS_COMPARATOR_BY_EXECUTION_COURSE_NAME);
-            attendedCoursesByName.addAll(owner.getCurrentAttends());
-            global.put("attendingCourses", attendedCoursesByName);
+            global.put("attendingCourses", owner.getCurrentAttends().stream()
+                    .sorted(Attends.ATTENDS_COMPARATOR_BY_EXECUTION_COURSE_NAME).collect(Collectors.toList()));
         }
 
         if (site.getShowAlumniDegrees()) {
@@ -74,27 +78,23 @@ public class PresentationComponent extends HomepageSiteComponent {
         }
 
         if (site.getShowEmail()) {
-            List<? extends PartyContact> emails = owner.getEmailAddresses();
-            global.put("emails", getSortedFilteredContacts(emails));
+            global.put("emails", getSortedFilteredContacts(owner.getEmailAddresses()));
         }
 
-        List<? extends PartyContact> phones = owner.getPhones();
         if (site.getShowPersonalTelephone()) {
-            global.put("personalPhones", getSortedFilteredContacts(phones, PartyContactType.PERSONAL));
+            global.put("personalPhones", getSortedFilteredContacts(owner.getPhones(), PartyContactType.PERSONAL));
         }
 
         if (site.getShowWorkTelephone()) {
-            global.put("workPhones", getSortedFilteredContacts(phones, PartyContactType.WORK));
+            global.put("workPhones", getSortedFilteredContacts(owner.getPhones(), PartyContactType.WORK));
         }
 
         if (site.getShowMobileTelephone()) {
-            List<? extends PartyContact> mobilePhones = owner.getMobilePhones();
-            global.put("mobilePhones", getSortedFilteredContacts(mobilePhones));
+            global.put("mobilePhones", getSortedFilteredContacts(owner.getMobilePhones()));
         }
 
         if (site.getShowAlternativeHomepage()) {
-            List<? extends PartyContact> websites = owner.getWebAddresses();
-            global.put("websites", getSortedFilteredContacts(websites));
+            global.put("websites", getSortedFilteredContacts(owner.getWebAddresses()));
         }
 
         if (site.getShowCurrentExecutionCourses() && owner.getTeacher() != null
@@ -107,35 +107,17 @@ public class PresentationComponent extends HomepageSiteComponent {
     }
 
     private boolean isVisible(PartyContact contact) {
-        boolean publicSpace = true; //because this is a homepage. When this logi[INFO] Copying 1 resource
-c is exported to a more proper place remember to pass this as an argument.
-        if (!Authenticate.isLogged() && publicSpace && contact.getVisibleToPublic().booleanValue()) {
-            return true;
+        if (!Authenticate.isLogged() || getUser().getPerson() == null) {
+            return contact.getVisibleToPublic();
+        } else {
+            Person reader = getUser().getPerson();
+            return (reader.hasRole(CONTACT_ADMIN) || reader.hasRole(MANAGER) || reader.hasRole(DIRECTIVE_COUNCIL))
+                    || (reader.hasRole(EMPLOYEE) && contact.getVisibleToEmployees())
+                    || (reader.hasRole(TEACHER) && contact.getVisibleToTeachers())
+                    || (reader.hasRole(STUDENT) && contact.getVisibleToStudents())
+                    || (reader.hasRole(ALUMNI) && contact.getVisibleToAlumni())
+                    || (contact.getVisibleToPublic());
         }
-        if (Authenticate.isLogged()) {
-            User user = Authenticate.getUser();
-            Person reader = user.getPerson();
-            if (reader.hasRole(RoleType.CONTACT_ADMIN).booleanValue() || reader.hasRole(RoleType.MANAGER).booleanValue()
-                    || reader.hasRole(RoleType.DIRECTIVE_COUNCIL).booleanValue()) {
-                return true;
-            }
-            if (reader.hasRole(RoleType.EMPLOYEE).booleanValue() && contact.getVisibleToEmployees().booleanValue()) {
-                return true;
-            }
-            if (reader.hasRole(RoleType.TEACHER).booleanValue() && contact.getVisibleToTeachers().booleanValue()) {
-                return true;
-            }
-            if (reader.hasRole(RoleType.STUDENT).booleanValue() && contact.getVisibleToStudents().booleanValue()) {
-                return true;
-            }
-            if (reader.hasRole(RoleType.ALUMNI).booleanValue() && contact.getVisibleToAlumni().booleanValue()) {
-                return true;
-            }
-            if (contact.getVisibleToPublic()) {
-                return true;
-            }
-        }
-        return false;
     }
 
     private List<PartyContact> getSortedFilteredContacts(Collection<? extends PartyContact> unfiltered, PartyContactType... types) {
@@ -153,9 +135,9 @@ c is exported to a more proper place remember to pass this as an argument.
             return -1;
         } else if (contact1.getType().ordinal() < contact2.getType().ordinal()) {
             return 1;
-        } else if (contact1.getDefaultContact().booleanValue()) {
+        } else if (contact1.getDefaultContact()) {
             return -1;
-        } else if (contact2.getDefaultContact().booleanValue()) {
+        } else if (contact2.getDefaultContact()) {
             return 1;
         } else {
             return contact1.getPresentationValue().compareTo(contact2.getPresentationValue());

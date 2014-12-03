@@ -24,7 +24,7 @@ import static pt.ist.fenixframework.FenixFramework.getDomainObject;
 
 @RestController
 @RequestMapping("/pages/{siteId}/admin")
-public class PagesAdminController extends StrutsFunctionalityController {
+public class PagesAdminController {
 
     @Autowired
     PagesAdminService service;
@@ -55,13 +55,11 @@ public class PagesAdminController extends StrutsFunctionalityController {
         return service.serialize(menuItem).toString();
     }
 
-    @RequestMapping(value = "/attachment", method = RequestMethod.POST)
-    public RedirectView addAttachments(@PathVariable String siteId,
-                             @RequestParam(required = true) String menuItemId,
-                             @RequestParam(required = true) String name,
-                             @RequestParam("attachment") MultipartFile attachment) throws IOException {
-        service.addAttachment(name, attachment, getDomainObject(menuItemId));
-        return new RedirectView(String.format("/pages/%s/admin#%s", siteId, menuItemId), true);
+    @RequestMapping(value = "/attachment/{menuItemId}", method = RequestMethod.POST)
+    public @ResponseBody String addAttachments(@PathVariable("menuItemId") String menuItemId,
+                                               @RequestParam("file") MultipartFile file) throws IOException {
+        service.addAttachment(file.getOriginalFilename(), file, getDomainObject(menuItemId));
+        return getAttachments(menuItemId);
     }
 
     @RequestMapping(value = "/attachment/{menuItemId}/{fileId}", method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON_VALUE)
@@ -85,11 +83,6 @@ public class PagesAdminController extends StrutsFunctionalityController {
         GroupBasedFile attachment = getDomainObject(updateMessage.get("fileId").getAsString());
         service.updateAttachment(menuItem, attachment, updateMessage.get("position").getAsInt());
         return getAttachments(menuItem.getExternalId());
-    }
-
-    @Override
-    protected Class<?> getFunctionalityType() {
-        return ManageExecutionCourseDA.class;
     }
 
     private static Site site(String siteId) {

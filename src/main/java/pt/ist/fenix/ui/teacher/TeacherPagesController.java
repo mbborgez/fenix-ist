@@ -1,24 +1,19 @@
 package pt.ist.fenix.ui.teacher;
 
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 import net.sourceforge.fenixedu.domain.ExecutionCourse;
 import net.sourceforge.fenixedu.domain.Professorship;
 import net.sourceforge.fenixedu.injectionCode.AccessControl;
 import net.sourceforge.fenixedu.presentationTier.Action.teacher.ManageExecutionCourseDA;
-import org.fenixedu.bennu.io.domain.GroupBasedFile;
-import org.fenixedu.cms.domain.MenuItem;
-import org.fenixedu.cms.domain.Site;
 import org.fenixedu.core.ui.StrutsFunctionalityController;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.MediaType;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.servlet.view.RedirectView;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.view.JstlView;
 
-import java.io.IOException;
-import java.util.Optional;
+import javax.servlet.http.HttpServletRequest;
 
 import static pt.ist.fenixframework.FenixFramework.getDomainObject;
 
@@ -31,84 +26,34 @@ public class TeacherPagesController extends StrutsFunctionalityController {
 
     @RequestMapping(method = RequestMethod.GET)
     public TeacherPagesView all(Model model, @PathVariable String executionCourseId) {
-        ExecutionCourse executionCourse = executionCourse(executionCourseId);
+        ExecutionCourse executionCourse = getDomainObject(executionCourseId);
         Professorship professorship = executionCourse.getProfessorship(AccessControl.getPerson());
-        AccessControl.check(person -> professorship!=null && professorship.getPermissions().getSections());
+        AccessControl.check(person -> professorship != null && professorship.getPermissions().getSections());
         model.addAttribute("executionCourse", executionCourse);
         model.addAttribute("professorship", professorship);
-        return TeacherPagesView.getInstance();
+        model.addAttribute("site", executionCourse.getCmsSite());
+        return new TeacherPagesView();
     }
 
-    @RequestMapping(value = "/data", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-    public @ResponseBody String data(@PathVariable String siteId) {
-        return service.serialize(site(siteId)).toString();
-    }
-
-    @RequestMapping(method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
-    public @ResponseBody String create(@PathVariable String siteId, @RequestBody String bodyJson) {
-        PagesAdminBean bean = new PagesAdminBean(bodyJson);
-        Site site = site(siteId);
-        Optional<MenuItem> menuItem = service.create(site, bean.getParent(), bean.getTitle(), bean.getBody(), bean.getPosition());
-        return service.serialize(menuItem.get()).toString();
-    }
-
-    @RequestMapping(value = "/{menuItemId}", method = RequestMethod.DELETE)
-    public @ResponseBody String delete(@PathVariable String siteId, @PathVariable String menuItemId) {
-        service.delete(getDomainObject(menuItemId));
-        return data(siteId);
-    }
-
-    @RequestMapping(method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_VALUE)
-    public @ResponseBody String edit(@RequestBody String bodyJson) {
-        PagesAdminBean bean = new PagesAdminBean(bodyJson);
-        MenuItem menuItem = service.edit(bean.getMenuItem(), bean.getParent(), bean.getTitle(), bean.getBody(), bean.getPosition(), bean.getCanViewGroup());
-        return service.serialize(menuItem).toString();
-    }
-
-    @RequestMapping(value = "/attachment", method = RequestMethod.POST)
-    public RedirectView addAttachments(@PathVariable String siteId,
-                             @RequestParam(required = true) String menuItemId,
-                             @RequestParam(required = true) String name,
-                             @RequestParam("attachment") MultipartFile attachment) throws IOException {
-        service.addAttachment(name, attachment, getDomainObject(menuItemId));
-        return new RedirectView(String.format("/teacher/%s/pages#%s", siteId, menuItemId), true);
-    }
-
-    @RequestMapping(value = "/attachment/{menuItemId}/{fileId}", method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public @ResponseBody String deleteAttachments(@PathVariable String menuItemId, @PathVariable String fileId) {
-        MenuItem menuItem = getDomainObject(menuItemId);
-        GroupBasedFile postFile = getDomainObject(fileId);
-        service.delete(menuItem, postFile);
-        return getAttachments(menuItemId);
-    }
-
-    @RequestMapping(value = "/attachments", method = RequestMethod.GET)
-    public @ResponseBody String getAttachments(@RequestParam(required = true) String menuItemId) {
-        MenuItem menuItem = getDomainObject(menuItemId);
-        return service.serializeAttachments(menuItem.getPage()).toString();
-    }
-
-    @RequestMapping(value = "/attachment", method = RequestMethod.PUT)
-    public @ResponseBody String updateAttachment(@RequestBody String bodyJson) {
-        JsonObject updateMessage = new JsonParser().parse(bodyJson).getAsJsonObject();
-        MenuItem menuItem = getDomainObject(updateMessage.get("menuItemId").getAsString());
-        GroupBasedFile attachment = getDomainObject(updateMessage.get("fileId").getAsString());
-        service.updateAttachment(menuItem, attachment, updateMessage.get("position").getAsInt());
-        return getAttachments(menuItem.getExternalId());
-    }
 
     @Override
     protected Class<?> getFunctionalityType() {
         return ManageExecutionCourseDA.class;
     }
 
-    private static Site site(String siteId) {
-        return getDomainObject(siteId);
+    class TeacherPagesView extends JstlView {
+
+        @Override
+        protected void exposeHelpers(HttpServletRequest request) throws Exception {
+            setServletContext(request.getServletContext());
+            super.exposeHelpers(request);
+            request.setAttribute("teacher$actual$page", "/teacher/pages.jsp");
+        }
+
+        @Override
+        public String getUrl() {
+            return "/teacher/executionCourse/executionCourseFrame.jsp";
+        }
+
     }
-
-    private static ExecutionCourse executionCourse(String executionCourseId) {
-        return getDomainObject(executionCourseId);
-    }
-
-
 }

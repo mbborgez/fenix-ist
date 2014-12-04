@@ -26,12 +26,14 @@ public class TeacherPagesController extends StrutsFunctionalityController {
 
     @RequestMapping(method = RequestMethod.GET)
     public TeacherPagesView all(Model model, @PathVariable String executionCourseId) {
-        ExecutionCourse executionCourse = getDomainObject(executionCourseId);
+        /*ExecutionCourse executionCourse = getDomainObject(executionCourseId);
         Professorship professorship = executionCourse.getProfessorship(AccessControl.getPerson());
         AccessControl.check(person -> professorship != null && professorship.getPermissions().getSections());
         model.addAttribute("executionCourse", executionCourse);
         model.addAttribute("professorship", professorship);
         model.addAttribute("site", executionCourse.getCmsSite());
+        return new TeacherPagesView();
+        */
         return new TeacherPagesView();
     }
 
@@ -47,7 +49,7 @@ public class TeacherPagesController extends StrutsFunctionalityController {
         protected void exposeHelpers(HttpServletRequest request) throws Exception {
             setServletContext(request.getServletContext());
             super.exposeHelpers(request);
-            request.setAttribute("teacher$actual$page", "/teacher/pages.jsp");
+            request.setAttribute("actual$page", "/teacher/teacherPages.jsp");
         }
 
         @Override

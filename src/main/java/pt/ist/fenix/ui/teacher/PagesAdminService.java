@@ -22,6 +22,7 @@ import pt.ist.fenixframework.Atomic;
 import java.io.IOException;
 import java.util.Optional;
 import java.util.function.Predicate;
+import java.util.stream.Stream;
 
 @Service
 public class PagesAdminService {
@@ -150,7 +151,9 @@ public class PagesAdminService {
             item.getChildrenSorted().stream().filter(isStaticPage).forEach(subitem -> children.add(serialize(subitem)));
             root.add("children", children);
         }
-        root.addProperty("canViewGroupIndex", canViewGroupIndex(item));
+        if(item.getPage().getSite() instanceof ExecutionCourseSite) {
+            root.addProperty("canViewGroupIndex", canViewGroupIndex(item));
+        }
 
         return root;
     }
@@ -200,7 +203,7 @@ public class PagesAdminService {
     }
 
     private Predicate<MenuItem> isStaticPage = menuItem -> menuItem.getPage()!=null &&
-                menuItem.getPage().getComponentsSet().stream().filter(component->component instanceof StaticPost)
+                menuItem.getPage().getComponentsSet().stream().filter(StaticPost.class::isInstance)
                     .map(component -> ((StaticPost) component).getPost()).filter(post->post!=null).findFirst().isPresent();
 
     @Atomic(mode = Atomic.TxMode.WRITE)
@@ -217,4 +220,13 @@ public class PagesAdminService {
         int currentPosition = attachments.getFiles().indexOf(attachment);
         attachments.move(currentPosition, newPosition);
     }
+
+    public Stream<Page> dynamicPages(Site site) {
+        return site.getPagesSet().stream().filter(this::isDynamicPage);
+    }
+
+    private boolean isDynamicPage(Page page) {
+        return !page.getComponentsSet().stream().filter(StaticPost.class::isInstance).findAny().isPresent();
+    }
+
 }

@@ -12,7 +12,7 @@ public class AnnouncementsAdminView extends JstlView {
     protected void exposeHelpers(HttpServletRequest request) throws Exception {
         setServletContext(request.getServletContext());
         super.exposeHelpers(request);
-        request.setAttribute("teacher$actual$page", "/teacher/announcements.jsp");
+        request.setAttribute("teacher$actual$page", "/cms/announcements.jsp");
     }
 
     @Override

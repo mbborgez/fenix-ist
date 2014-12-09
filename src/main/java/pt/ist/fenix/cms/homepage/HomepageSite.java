@@ -10,8 +10,8 @@ public class HomepageSite extends HomepageSite_Base {
     public HomepageSite(Person person) {
         super();
         setBennu(Bennu.getInstance());
-        setName(getLocalizedString("resources.FenixEduCMSResources", "homepage.title", person.getName()));
-        setDescription(getLocalizedString("resources.FenixEduCMSResources", "homepage.title", person.getName()));
+        setName(getLocalizedString("resources.FenixEduLearningResources", "homepage.title", person.getName()));
+        setDescription(getLocalizedString("resources.FenixEduLearningResources", "homepage.title", person.getName()));
         setSlug(person.getUser().getUsername());
         setOwner(person);
     }

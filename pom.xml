@@ -86,8 +86,8 @@
         </dependency>
         <dependency>
             <groupId>org.fenixedu</groupId>
-            <artifactId>fenixedu-cms-academic-integration</artifactId>
-            <version>1.0.0-SNAPSHOT</version>
+            <artifactId>fenixedu-learning</artifactId>
+            <version>4.0.0-SNAPSHOT</version>
         </dependency>
     </dependencies>
 

@@ -30,7 +30,7 @@ import static pt.ist.fenixframework.FenixFramework.getDomainObject;
 @Controller
 @RequestMapping("/teacher/{executionCourseId}/announcements")
 public class AnnouncementsAdminController extends StrutsFunctionalityController {
-    private static final LocalizedString ANNOUNCEMENT = getLocalizedString("resources.FenixEduCMSResources", "label.announcements");
+    private static final LocalizedString ANNOUNCEMENT = getLocalizedString("resources.FenixEduLearningResources", "label.announcements");
 
     @RequestMapping(method = RequestMethod.GET)
     public AnnouncementsAdminView all(Model model, @PathVariable String executionCourseId){

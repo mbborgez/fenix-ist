@@ -22,56 +22,51 @@
 
 {% macro viewPost(post, page, request) %}
 
-    <div>
-        {% if post.isVisible %}
+<div>
+    {% if post.isVisible %}
 
-            {% if post.name.content != page.name.content %}
-                <h2 style="margin-top: 0"><a href="{{post.address}}">{{ post.name.content }}</a></h2>
-                <p class="small">
-                    {{ post.creationDate|formatDate("d MMMM Y, HH:mm") }} - {{post.createdBy.displayName}}
-                </p>
-            {% endif %}
+    {% if post.name.content != page.name.content %}
+    <h5 style="margin-top: 0; font-weight:400"><a href="{{post.address}}">{{ post.name.content }}</a></h5>
 
-            <p>{{post.body.content | raw}}</p>
+    <p class="small" style="font-size:11px; color:#888;margin-top:5px; margin-bottom:18px;">
+        <span>{{ post.creationDate|formatDate("d MMMM Y, HH:mm") }} </span>
+        <span style="padding-left:5px; padding-right:5px; color:#ddd;">&bull;</span>
+        <span>{{post.createdBy.displayName}}</span>
+    </p>
+    {% endif %}
 
-            {% if post.attachments.size != 0 %}
-                <p>
-                <h4>Attachments</h4>
-                <ul>
-                    {% for file in post.attachments %}
-                        <li><a href="{{file.url}}">{{file.name}}</a></li>
-                    {% endfor %}
-                </ul>
-                </p>
-            {% endif %}
+    <p>{{post.body.content | raw}}</p>
 
-        {% else %}
+    {% if post.attachments.size != 0 %}
+    <p>
+    <h4>Attachments</h4>
+    <ul>
+        {% for file in post.attachments %}
+        <li><a href="{{file.url}}">{{file.name}}</a></li>
+        {% endfor %}
+    </ul>
+    </p>
+    {% endif %}
 
-            {% if request.user.isAuthenticated %}
-                
-                <p>
-                    {{ i18n('CmsExceptionResources', 'label.autenticated.private.post') }}
-                </p>
+    {% else %}
+    <p>
+        {{ i18n('CmsExceptionResources', 'label.unautenticated.private.post') }} {{ post.visibilityGroup }}
+    </p>
+    {% if request.user is empty or not request.user.isAuthenticated %}
+    <p>
+        <a href="{{request.contextPath}}/login?callback={{ request.url }}">Login</a>
+    </p>
+    {% endif %}
 
-            {% else %}
+    {% endif %}
 
-                <p>
-                    {{ i18n('CmsExceptionResources', 'label.unautenticated.private.post') }} {{ post.visibilityGroup }}
-                </p>
-
-                <p>
-                    <a href="/login?callback={{ request.url }}">Login</a>
-                </p>    
-
-            {% endif %}    
-
-        {% endif %}
-
-    </div><!-- /.blog-post -->
+</div><!-- /.blog-post -->
 
 
 {% endmacro %}
+{% block contentTitle %}
 
+{% endblock contentTitle %}
 {% block content %}
-	{{ viewPost(post, page, request) }}
+{{ viewPost(post, page, request) }}
 {% endblock content %}

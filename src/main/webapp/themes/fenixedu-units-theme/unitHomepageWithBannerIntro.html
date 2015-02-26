@@ -22,32 +22,39 @@
 
 {% block unitHeader %}
 
-	<div class="row">
-		<div class="col-md-12">
-			<div class="banner">
-				{% if showBanner %}
+{% if post is not empty %}
+<div class="row">
+	<div class="col-md-12">
+		<div class="banner">
 
-					<a href="{{ link is not empty ? link : '#' }}">
-						<img class="img-responsive center-block" src="{{ mainImage }}" alt="banner">
-					</a>
+			<a href="{{ link is not empty ? link : '#' }}">
+				<img class="img-responsive center-block" src="{{ mainImage }}" alt="banner">
+			</a>
 
-				{% endif %}
-
-				<div class="clearfix"></div>
-			</div>
+			<div class="clearfix"></div>
 		</div>
 	</div>
+	<style>
+		.banner {
+			width: 100%;
+			float: left;
+		background-color: {{ color }};
+		/*background-image: url('{{ backgroundImage }}');*/
+		background-repeat: {{ repeatType }};
+		}
+	</style>
+</div>
+{ % endif %}
+
+{% if site.description is not empty %}
 	<br />
 	<div class="row">
 		<div class="col-md-12">
 			<div class="introduction">
-				{% if showIntroduction %}
-					{% if site.description is not empty %}
-						{{ site.description.content | raw }}
-					{% endif %}
-				{% endif %}
+				{{ site.description.content | raw }}
 			</div>
 		</div>
 	</div>
+{% endif %}
 
 {% endblock unitHeader %}

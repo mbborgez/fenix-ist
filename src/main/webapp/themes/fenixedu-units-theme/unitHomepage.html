@@ -27,10 +27,10 @@
     
     <hr />
 
-    <div class="row">   
-        {% set colSize = showEvents and events is not empty and showAnnouncements and announcements is not empty ? 6 : 12 %}
+    <div class="row">
+        {% set colSize = events is not empty and announcements is not empty ? 6 : 12 %}
 
-        {% if showAnnouncements and announcements is not empty %}
+        {% if announcements is not empty %}
         <div class="col-md-{{ colSize }}">
             <div class="panel panel-default">
                 <div class="panel-heading">
@@ -43,11 +43,10 @@
                     <a href="{{ announcementsUrl }}">{{ i18n('resources.FenixEduLearningResources', 'label.announcements.all') }}</a>
                 </div>
             </div>
-
         </div>
         {% endif %}
 
-        {% if showEvents and events is not empty %}
+        {% if events is not empty %}
         <div class="col-md-{{ colSize }}">
             <div class="panel panel-default">
                 <div class="panel-heading">

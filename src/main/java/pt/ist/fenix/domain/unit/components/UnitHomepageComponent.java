@@ -47,18 +47,15 @@ public class UnitHomepageComponent implements CMSComponent {
         String staticDir = page.getSite().getStaticDirectory();
         global.put("announcements", postsForCategory(page.getSite().categoryForSlug("announcement")));
         global.put("events", postsForCategory(page.getSite().categoryForSlug("event")));
+
         global.put("backgroundImage", metadata.getAsString("backgroundImage").orElse(staticDir + "/images/bolonha_bck.gif"));
         global.put("mainImage", metadata.getAsString("mainImage").orElse(staticDir + "/images/bolonha.gif"));
         global.put("link", metadata.getAsString("link").orElse("http://www.bolonha.ist.eu"));
-        global.put("showIntroduction", metadata.getAsBoolean("showIntroduction").orElse(true));
         global.put("repeatType", metadata.getAsString("repeatType").orElse("repeat-x"));
         global.put("color", metadata.getAsString("color").orElse("#019AD7"));
-        global.put("showBanner", metadata.getAsBoolean("showBanner").orElse(true));
         global.put("weight", metadata.getAsNumber("weight").orElse(100));
         global.put("weightPercentage", metadata.getAsNumber("weightPercentage").orElse(100));
-        global.put("showPersonalizedLogo", metadata.getAsBoolean("showPersonalizedLogo").orElse(false));
-        global.put("showAnnouncements", metadata.getAsBoolean("showAnnouncements").orElse(true));
-        global.put("showEvents", metadata.getAsBoolean("showEvents").orElse(true));
+
         pageForCategory(page.getSite(), "announcement").ifPresent(announcementsPage -> {
             global.put("announcementsUrl", announcementsPage.getAddress());
         });

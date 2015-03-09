@@ -23,41 +23,61 @@
 {% import "fenixedu-units-theme/view.html" %}
 
 {% block content %}
+    <div id="search-container" class="col-md-6">
+        <div class="input-group">
+            <input type="text" class="form-control" placeholder="Search for..." id="search-input">
+            <span class="input-group-btn">
+                <button id="search-btn" class="btn btn-default" type="button">
+                    <span class="glyphicon glyphicon-search"></span>
+                </button>
+            </span>
+        </div>
+        <br/>
+    </div>
+    {% if pagination.pages is not empty %}
 
-  {% if pagination.pages is not empty %}
-      {% for post in pagination.posts %}
-        {{ viewPost(post) }}
-        <hr />
-      {% endfor %}
-
-      {% if pagination.pages.size != 1 %}
-      <center>
-      <ul class="pagination pagination-sm">
-
-        {% if pagination.current != 1 %}
-          <li><a href="?p={{pagination.current - 1}}">&laquo;</a></li>
-        {% else %}
-          <li class="disabled"><a href="">&laquo;</a></li>
-        {% endif %}
-
-        {% for i in pagination.pages %}
-          {% if loop.index + 1 == pagination.current %}
-            <li class="active"><a href="{{ i.url }}">{{loop.index + 1}}</a></li>
-          {% else %}
-            <li><a href="{{ i.url }}">{{loop.index + 1}}</a></li>
-          {% endif %}
+        {% for post in pagination.posts %}
+            {{ viewPost(post) }}
+            <hr />
         {% endfor %}
+        {% include "fenixedu-units-theme/pagination.html" %}
+    {% else %}
+        <h4>Currently there are no posts.<h4/>
+    {% endif %}
 
-        {% if pagination.current != pagination.pages.size %}
-          <li><a href="?p={{pagination.current + 1}}">&raquo;</a></li>
-        {% else %}
-          <li class="disabled"><a href="">&raquo;</a></li>
-        {% endif %}
+    <script type="application/javascript">
+        $('#search-input').val(getParameterByName('q') || "");
+        $('#search-input').on('keyup blur', onSearchInputChange);
+        $('#search-btn').click(search);
+        onSearchInputChange();
 
-      </ul>
-      </center>
-      {% endif %}
-  {% else %}
-    <h4>Currently there are no posts.<h4/>
-  {% endif %}
+        if (isEmptyPosts()) {
+            $('#search-container').hide();
+        }
+
+        $(document).keypress(function (e) {
+            if (e.which == 13) search();
+        });
+
+        function search() {
+            var searchQuery = $('#search-input').val();
+            window.location.search = searchQuery ? '?q=' + searchQuery : '';
+        }
+
+        function getParameterByName(name) {
+            name = name.replace(/[\[]/, "\\[").replace(/[\]]/, "\\]");
+            var regex = new RegExp("[\\?&]" + name + "=([^&#]*)"), results = regex.exec(window.location.search);
+            return results === null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "));
+        }
+
+        function onSearchInputChange() {
+            $('#search-btn').prop('disabled', $('#search-input').val().trim().length == 0);
+        }
+
+        function isEmptyPosts() {
+            return Boolean('{{ pagination.pages is empty }}') && getParameterByName('q').length == 0;
+        }
+
+    </script>
+
 {% endblock content %}
